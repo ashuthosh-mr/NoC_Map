@@ -23,8 +23,6 @@ hown = np.zeros((n,V), dtype=int)
 send_local = np.zeros((n,n), dtype=int)
 send_total = [0]*n
 receive_total = [0]*n
-communication_total = [0]*n
-cfactor = [0]*np
 while i<n:
     a=0
     d=0
@@ -60,12 +58,12 @@ while count:
             id=h_graph_edges[k]
             i=0
             while i<n:
-                if(howns[i][tid]>=0):
-                    if(howns[i][id]<0):
-                        temp1=abs(howns[i][id])-1
-                        send[i][temp1]=send[i][temp1]+1
+                if(hown[i][tid]>=0):
+                    if(hown[i][id]<0):
+                        temp1=abs(hown[i][id])-1
+                        send_local[i][temp1]=send_local[i][temp1]+1
                     else:
-                        send[i][i]=send[i][i]+1
+                        send_local[i][i]=send_local[i][i]+1
                 i=i+1
             if(h_cost[id]<0):
                 h_cost[id]=iter
@@ -79,6 +77,21 @@ h_graph_active.clear()
 h_updating_graph_active.clear()
 print(iter)
 temp2=0
-for i in range (1,n):
-    temp2=temp2+send[0][i]
+inter_communication = [0]*n
+intra_communication = [0]*n
+cfactor = [0.0]*n
+for i in range (0,n):
+    for j in range (0,n):
+        if(i!=j):
+            send_total[i]=send_total[i]+send_local[i][j]
+            receive_total[j]=receive_total[j]+send_local[i][j]
+        if(i==j):
+            intra_communication[i]=intra_communication[i]+send_local[i][i]
+for x, y in zip(send_total, receive_total):
+    inter_communication.append(x + y)
+for x, y in zip(inter_communication, intra_communication):
+    cfactor.append(x / y)
+
+for i in range (0,n-1):
+    temp2=temp2+send_local[15][i]
 print(temp2)
