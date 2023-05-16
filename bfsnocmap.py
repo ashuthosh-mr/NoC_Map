@@ -34,8 +34,11 @@ def calculate_hops_2D_torus(node1, node2, rows, columns):
 
     return row_diff + col_diff
 
-def plotheat(temporary_argument, heatmap, n):
+def plotheat(temporary_argument, heatmap, n, subplot_index):
     network_size = n
+
+    # Create a subplot at the specified index
+    plt.subplot(subplot_index)
 
     # Create the heatmap
     plt.imshow(heatmap, cmap='Greens', interpolation='nearest', vmin=0, vmax=network_size)
@@ -52,7 +55,6 @@ def plotheat(temporary_argument, heatmap, n):
     plt.ylabel('Source')
     plt.title('NoC_MAP of ' + temporary_argument)
 
-    return plt.gcf()
 
 # Check if the number of command line arguments is valid
 if len(sys.argv) != 6:
@@ -164,23 +166,31 @@ for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-heatmaps.append(plotheat(temporary_argument, heatmap, n))
+plt.subplot(2, 2, 1)
+plotheat(temporary_argument, heatmap, n,111)
 temporary_argument = '1Dtorus'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops_tor(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-heatmaps.append(plotheat(temporary_argument, heatmap, n))
+plt.subplot(2, 2, 2)
+plotheat(temporary_argument, heatmap, n,111)
 temporary_argument = '2Dmesh'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-heatmaps.append(plotheat(temporary_argument, heatmap, n))
+plt.subplot(2, 2, 3)
+plotheat(temporary_argument, heatmap, n,111)
 temporary_argument = '2Dmeshtorus'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D_torus(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-heatmaps.append(plotheat(temporary_argument, heatmap, n))
+plt.subplot(2, 2, 4)
+plotheat(temporary_argument, heatmap, n,111)
+# Adjust the spacing between subplots
+plt.tight_layout()
+
+# Show the plot
 plt.show()
