@@ -148,6 +148,10 @@ for i in range(len(send_total)):
 for i in range(len(send_total)):
     cfactor[i]=round((inter_communication[i]/intra_communication[i]),2)
 
+#debug
+for i in range (0,n-1):
+    temp2=temp2+send_local[15][i]
+print(temp2)
 #send_total is the main thing to be plotted
 
 network_size = n
