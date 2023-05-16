@@ -84,9 +84,13 @@ for i in range (0,n):
     for j in range (0,n):
         if(i!=j):
             send_total[i]=send_total[i]+send_local[i][j]
-            receive_total[j]=receive_total[j]+send_local[i][j]
         if(i==j):
             intra_communication[i]=intra_communication[i]+send_local[i][i]
+for i in range (0,n):
+    for j in range (0,n):
+        if(i!=j):
+            receive_total[i]=receive_total[i]+send_local[j][i]
+
 for x, y in zip(send_total, receive_total):
     inter_communication.append(x + y)
 for x, y in zip(inter_communication, intra_communication):
