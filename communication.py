@@ -10,7 +10,7 @@ if len(sys.argv) != 4:
     sys.exit(1)
 
 # Parse command line arguments
-np = int(sys.argv[1])
+n = int(sys.argv[1])
 graph = sys.argv[2]
 V = int(sys.argv[3])
 
@@ -19,16 +19,16 @@ i=0
 a=0;
 d=0;
 #generate howns
-hown = np.zeros((np,ver), dtype=int)
-send_local = np.zeros((np,np), dtype=int)
-send_total = [0]*np
-receive_total = [0]*np
-communication_total = [0]*np
+hown = np.zeros((n,V), dtype=int)
+send_local = np.zeros((n,n), dtype=int)
+send_total = [0]*n
+receive_total = [0]*n
+communication_total = [0]*n
 cfactor = [0]*np
-while i<np:
+while i<n:
     a=0
     d=0
-    with open('tometis'+graph+'.part.'+str(np)) as f3:
+    with open('tometis'+graph+'.part.'+str(n)) as f3:
         for line in f3:
             Type = line.split()
             if(Type[0]==str(i)):
@@ -59,7 +59,7 @@ while count:
         for k in range(h_graph_nodes[tid],h_graph_nodes[tid+1]):
             id=h_graph_edges[k]
             i=0
-            while i<np:
+            while i<n:
                 if(howns[i][tid]>=0):
                     if(howns[i][id]<0):
                         temp1=abs(howns[i][id])-1
@@ -79,6 +79,6 @@ h_graph_active.clear()
 h_updating_graph_active.clear()
 print(iter)
 temp2=0
-for i in range (1,np):
+for i in range (1,n):
     temp2=temp2+send[0][i]
 print(temp2)
