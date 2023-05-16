@@ -52,7 +52,7 @@ def plotheat(temporary_argument, heatmap, n):
     plt.ylabel('Source')
     plt.title('NoC_MAP of ' + temporary_argument)
 
-    plt.show(block=False)
+    return plt.gcf()
 
 # Check if the number of command line arguments is valid
 if len(sys.argv) != 6:
@@ -158,27 +158,29 @@ network_size = n
 network_size=rows*columns
 heatmap = np.zeros((network_size, network_size))
 # Calculate number of hops for all node pairs
+heatmaps = []
 temporary_argument = '1D'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-plotheat(temporary_argument, heatmap, n)
+heatmaps.append(plotheat(temporary_argument, heatmap, n))
 temporary_argument = '1Dtorus'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops_tor(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-plotheat(temporary_argument, heatmap, n)
+heatmaps.append(plotheat(temporary_argument, heatmap, n))
 temporary_argument = '2Dmesh'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-plotheat(temporary_argument, heatmap, n)
+heatmaps.append(plotheat(temporary_argument, heatmap, n))
 temporary_argument = '2Dmeshtorus'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D_torus(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-plotheat(temporary_argument, heatmap, n)
+heatmaps.append(plotheat(temporary_argument, heatmap, n))
+plt.show()
