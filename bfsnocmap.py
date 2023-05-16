@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from data import h_graph_edges,h_graph_nodes
+from data_road import h_graph_edges,h_graph_nodes
 
 #function definitions
 
@@ -152,9 +152,9 @@ for i in range(len(send_total)):
     cfactor[i]=round((inter_communication[i]/intra_communication[i]),2)
 
 #debug
-for i in range (0,n-1):
-    temp2=temp2+send_local[15][i]
-print(temp2)
+#for i in range (0,n-1):
+#    temp2=temp2+send_local[15][i]
+#print(temp2)
 #send_total is the main thing to be plotted
 
 network_size = n
@@ -168,7 +168,8 @@ for node1 in range(1,network_size+1):
         heatmap[node1-1][node2-1]=num_hops
 for i in range(0,n):
     for j in range(0,n):
-        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+        if(send_local[i][j]!=0):
+            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 1)
 plotheat(temporary_argument, heatmap, n,2,2,1)
 
@@ -179,7 +180,8 @@ for node1 in range(1,network_size+1):
         heatmap[node1-1][node2-1]=num_hops
 for i in range(0,n):
     for j in range(0,n):
-        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+        if(send_local[i][j]!=0):
+            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 2)
 plotheat(temporary_argument, heatmap, n,2,2,2)
 
@@ -190,7 +192,8 @@ for node1 in range(1, rows*columns + 1):
         heatmap[node1-1][node2-1]=num_hops
 for i in range(0,n):
     for j in range(0,n):
-        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+        if(send_local[i][j]!=0):
+            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 3)
 plotheat(temporary_argument, heatmap, n,2,2,3)
 
@@ -201,7 +204,8 @@ for node1 in range(1, rows*columns + 1):
         heatmap[node1-1][node2-1]=num_hops
 for i in range(0,n):
     for j in range(0,n):
-        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+        if(send_local[i][j]!=0):
+            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 4)
 plotheat(temporary_argument, heatmap, n,2,2,4)
 # Adjust the spacing between subplots
