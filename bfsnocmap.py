@@ -34,14 +34,15 @@ def calculate_hops_2D_torus(node1, node2, rows, columns):
 
     return row_diff + col_diff
 
-def plotheat(temporary_argument, heatmap, n, subplot_index):
+def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_index):
     network_size = n
+    maximum_value = np.max(heatmap)
 
     # Create a subplot at the specified index
-    plt.subplot(subplot_index)
+    plt.subplot(subplot_row, subplot_col, subplot_index)
 
     # Create the heatmap
-    plt.imshow(heatmap, cmap='Greens', interpolation='nearest', vmin=0, vmax=network_size)
+    plt.imshow(heatmap, cmap='Greens', interpolation='nearest', vmin=0, vmax=maximum_value)
 
     # Add colorbar
     cbar = plt.colorbar(ticks=np.arange(network_size+1))
@@ -160,35 +161,49 @@ network_size = n
 network_size=rows*columns
 heatmap = np.zeros((network_size, network_size))
 # Calculate number of hops for all node pairs
-heatmaps = []
 temporary_argument = '1D'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
+for i in range(0,n):
+    for j in range(0,n):
+        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 1)
-plotheat(temporary_argument, heatmap, n,111)
+plotheat(temporary_argument, heatmap, n,2,2,1)
+
 temporary_argument = '1Dtorus'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops_tor(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
+for i in range(0,n):
+    for j in range(0,n):
+        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 2)
-plotheat(temporary_argument, heatmap, n,111)
+plotheat(temporary_argument, heatmap, n,2,2,2)
+
 temporary_argument = '2Dmesh'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
+for i in range(0,n):
+    for j in range(0,n):
+        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 3)
-plotheat(temporary_argument, heatmap, n,111)
+plotheat(temporary_argument, heatmap, n,2,2,3)
+
 temporary_argument = '2Dmeshtorus'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D_torus(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
+for i in range(0,n):
+    for j in range(0,n):
+        heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 plt.subplot(2, 2, 4)
-plotheat(temporary_argument, heatmap, n,111)
+plotheat(temporary_argument, heatmap, n,2,2,4)
 # Adjust the spacing between subplots
 plt.tight_layout()
 
