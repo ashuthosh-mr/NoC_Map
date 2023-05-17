@@ -1,7 +1,6 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-#from data_web import h_graph_edges,h_graph_nodes
 
 #function definitions
 
@@ -67,7 +66,6 @@ def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_i
             plt.text(j, i, str(heatmap[i, j]), color='black', ha='center', va='center')
     plt.suptitle('This is the plot of '+kind)
 
-#def import_data_module(graph):
 
 # Check if the number of command line arguments is valid
 if len(sys.argv) != 7:
@@ -88,8 +86,6 @@ importlib.invalidate_caches()  # Optional: Clear import caches if needed
 data_module = importlib.import_module(module_name)
 h_graph_edges = data_module.h_graph_edges
 h_graph_nodes = data_module.h_graph_nodes
-
-#import_data_module(graph)
 
 #take input file from metis
 i=0
