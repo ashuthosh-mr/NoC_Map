@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from data_road import h_graph_edges,h_graph_nodes
+from data_web import h_graph_edges,h_graph_nodes
 
 #function definitions
 
@@ -34,7 +34,14 @@ def calculate_hops_2D_torus(node1, node2, rows, columns):
 
     return row_diff + col_diff
 
-def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_index):
+def calculate_hops_alltoall(node1, node2,network_size):
+    if(node1==node2):
+        return node1-node2
+    else:
+        return network_size
+
+    return row_diff + col_diff
+def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_index,kind):
     network_size = n
     maximum_value = np.max(heatmap)
 
@@ -45,9 +52,9 @@ def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_i
     plt.imshow(heatmap, cmap='Greens', interpolation='nearest', vmin=0, vmax=maximum_value)
 
     # Add colorbar
-    cbar = plt.colorbar(ticks=np.arange(network_size+1))
-    cbar.ax.set_yticklabels(np.arange(network_size+1), fontsize=10)
-    cbar.set_label('Hops', rotation=270, labelpad=10)
+#    cbar = plt.colorbar(ticks=np.arange(network_size+1))
+#    cbar.ax.set_yticklabels(np.arange(network_size+1), fontsize=10)
+#    cbar.set_label('Hops', rotation=270, labelpad=10)
 
     # Set labels and title
     plt.xticks(np.arange(network_size), np.arange(1, network_size+1))
@@ -55,11 +62,13 @@ def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_i
     plt.xlabel('Destination')
     plt.ylabel('Source')
     plt.title('NoC_MAP of ' + temporary_argument)
-
-
+    for i in range(network_size):
+        for j in range(network_size):
+            plt.text(j, i, str(heatmap[i, j]), color='black', ha='center', va='center')
+    plt.suptitle('This is the plot of '+kind)
 # Check if the number of command line arguments is valid
-if len(sys.argv) != 6:
-    print("Usage: python communication.py <number_of_nodes> <graph> <number_of_vertices> <rows> <columns>")
+if len(sys.argv) != 7:
+    print("Usage: python communication.py <number_of_nodes> <graph> <number_of_vertices> <rows> <columns> <map,send,cfactor>")
     sys.exit(1)
 
 # Parse command line arguments
@@ -68,7 +77,7 @@ graph = sys.argv[2]
 V = int(sys.argv[3])
 rows = int(sys.argv[4])
 columns = int(sys.argv[5])
-
+kind = sys.argv[6]
 #take input file from metis
 i=0
 a=0;
@@ -134,7 +143,9 @@ print(iter)
 temp2=0
 inter_communication = [0]*n
 intra_communication = [0]*n
-cfactor = [0.0]*n
+#cfactor = [0.0]*n
+cfactor = np.zeros((n,n), dtype=float)
+
 for i in range (0,n):
     for j in range (0,n):
         if(i!=j):
@@ -148,8 +159,9 @@ for i in range (0,n):
 
 for i in range(len(send_total)):
     inter_communication[i] = send_total[i] + receive_total[i]
-for i in range(len(send_total)):
-    cfactor[i]=round((inter_communication[i]/intra_communication[i]),2)
+#for i in range(len(send_total)):
+#    cfactor[i]=round((inter_communication[i]/intra_communication[i]),2)
+
 
 #debug
 #for i in range (0,n-1):
@@ -159,55 +171,96 @@ for i in range(len(send_total)):
 
 network_size = n
 network_size=rows*columns
+for i in range(0,network_size):
+    for j in range(0,network_size):
+        if(send_local[i][j]!=0):
+            cfactor[i][j]=round((send_local[i][i]/send_local[i][j]),2)
 heatmap = np.zeros((network_size, network_size))
 # Calculate number of hops for all node pairs
+temporary_argument = 'alltoall'
+for node1 in range(1,network_size+1):
+    for node2 in range(1,network_size+1):
+        num_hops = calculate_hops_alltoall(node1, node2, network_size)
+        heatmap[node1-1][node2-1]=num_hops
+if kind=='send':
+    for i in range(0,n):
+        for j in range(0,n):
+            if(send_local[i][j]!=0):
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+elif kind=='cfactor':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=cfactor[i][j]
+plt.subplot(2, 3, 1)
+plotheat(temporary_argument, heatmap, n,2,3,1,kind)
+
 temporary_argument = '1D'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-for i in range(0,n):
-    for j in range(0,n):
-        if(send_local[i][j]!=0):
-            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
-plt.subplot(2, 2, 1)
-plotheat(temporary_argument, heatmap, n,2,2,1)
+if kind=='send':
+    for i in range(0,n):
+        for j in range(0,n):
+            if(send_local[i][j]!=0):
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+elif kind=='cfactor':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=cfactor[i][j]
+plt.subplot(2, 3, 2)
+plotheat(temporary_argument, heatmap, n,2,3,2,kind)
 
 temporary_argument = '1Dtorus'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops_tor(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-for i in range(0,n):
-    for j in range(0,n):
-        if(send_local[i][j]!=0):
-            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
-plt.subplot(2, 2, 2)
-plotheat(temporary_argument, heatmap, n,2,2,2)
+if kind=='send':
+    for i in range(0,n):
+        for j in range(0,n):
+            if(send_local[i][j]!=0):
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+elif kind=='cfactor':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=cfactor[i][j]
+plt.subplot(2, 3, 3)
+plotheat(temporary_argument, heatmap, n,2,3,3,kind)
 
 temporary_argument = '2Dmesh'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-for i in range(0,n):
-    for j in range(0,n):
-        if(send_local[i][j]!=0):
-            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
-plt.subplot(2, 2, 3)
-plotheat(temporary_argument, heatmap, n,2,2,3)
+if kind=='send':
+    for i in range(0,n):
+        for j in range(0,n):
+            if(send_local[i][j]!=0):
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+elif kind=='cfactor':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=cfactor[i][j]
+plt.subplot(2, 3, 4)
+plotheat(temporary_argument, heatmap, n,2,3,4,kind)
 
 temporary_argument = '2Dmeshtorus'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D_torus(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-for i in range(0,n):
-    for j in range(0,n):
-        if(send_local[i][j]!=0):
-            heatmap[i][j]=heatmap[i][j]*send_local[i][j]
-plt.subplot(2, 2, 4)
-plotheat(temporary_argument, heatmap, n,2,2,4)
+if kind=='send':
+    for i in range(0,n):
+        for j in range(0,n):
+            if(send_local[i][j]!=0):
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+elif kind=='cfactor':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=cfactor[i][j]
+plt.subplot(2, 3, 5)
+plotheat(temporary_argument, heatmap, n,2,3,5,kind)
 # Adjust the spacing between subplots
 plt.tight_layout()
 
