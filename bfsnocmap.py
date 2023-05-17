@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from data_web import h_graph_edges,h_graph_nodes
+#from data_web import h_graph_edges,h_graph_nodes
 
 #function definitions
 
@@ -66,6 +66,9 @@ def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_i
         for j in range(network_size):
             plt.text(j, i, str(heatmap[i, j]), color='black', ha='center', va='center')
     plt.suptitle('This is the plot of '+kind)
+
+#def import_data_module(graph):
+
 # Check if the number of command line arguments is valid
 if len(sys.argv) != 7:
     print("Usage: python communication.py <number_of_nodes> <graph> <number_of_vertices> <rows> <columns> <map,send,cfactor>")
@@ -78,6 +81,16 @@ V = int(sys.argv[3])
 rows = int(sys.argv[4])
 columns = int(sys.argv[5])
 kind = sys.argv[6]
+
+import importlib
+module_name = 'data_' + graph
+importlib.invalidate_caches()  # Optional: Clear import caches if needed
+data_module = importlib.import_module(module_name)
+h_graph_edges = data_module.h_graph_edges
+h_graph_nodes = data_module.h_graph_nodes
+
+#import_data_module(graph)
+
 #take input file from metis
 i=0
 a=0;
