@@ -40,12 +40,12 @@ def calculate_hops_alltoall(node1, node2,network_size):
         return network_size
 
     return row_diff + col_diff
-def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_index,kind):
+def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, subplot_index,kind):
     network_size = n
     maximum_value = np.max(heatmap)
 
     # Create a subplot at the specified index
-    plt.subplot(subplot_row, subplot_col, subplot_index)
+    #plt.subplot(subplot_row, subplot_col, subplot_index)
 
     # Create the heatmap
     plt.imshow(heatmap, cmap='Greens', interpolation='nearest', vmin=0, vmax=maximum_value)
@@ -60,25 +60,26 @@ def plotheat(temporary_argument, heatmap, n, subplot_row, subplot_col, subplot_i
     plt.yticks(np.arange(network_size), np.arange(1, network_size+1))
     plt.xlabel('Destination')
     plt.ylabel('Source')
-    plt.title('NoC_MAP of ' + temporary_argument)
+    plt.title('NoC_MAP of ' + temporary_argument+' and '+kind)
     for i in range(network_size):
         for j in range(network_size):
-            plt.text(j, i, str(heatmap[i, j]), color='black', ha='center', va='center')
-    plt.suptitle('This is the plot of '+kind)
+            plt.text(j, i, str(int(heatmap[i, j])), color='black', ha='center', va='center',fontsize=8)
+    #plt.suptitle('This is the plot of '+kind)
+    plt.savefig('./plots/'+temporary_argument+'.png')
+    plt.close()
 
 
 # Check if the number of command line arguments is valid
-if len(sys.argv) != 7:
+if len(sys.argv) != 6:
     print("Usage: python communication.py <number_of_nodes> <graph> <number_of_vertices> <rows> <columns> <map,send,cfactor>")
     sys.exit(1)
 
 # Parse command line arguments
 n = int(sys.argv[1])
 graph = sys.argv[2]
-V = int(sys.argv[3])
-rows = int(sys.argv[4])
-columns = int(sys.argv[5])
-kind = sys.argv[6]
+rows = int(sys.argv[3])
+columns = int(sys.argv[4])
+kind = sys.argv[5]
 
 import importlib
 module_name = 'data_' + graph
@@ -91,6 +92,11 @@ h_graph_nodes = data_module.h_graph_nodes
 i=0
 a=0;
 d=0;
+V=0;
+with open('./partitions/tometis'+graph+'.part.'+str(n)) as f3:
+    for line in f3:
+        Type = line.split()
+        V=V+1
 #generate howns
 hown = np.zeros((n,V), dtype=int)
 send_local = np.zeros((n,n), dtype=int)
@@ -99,7 +105,7 @@ receive_total = [0]*n
 while i<n:
     a=0
     d=0
-    with open('tometis'+graph+'.part.'+str(n)) as f3:
+    with open('./partitions/tometis'+graph+'.part.'+str(n)) as f3:
         for line in f3:
             Type = line.split()
             if(Type[0]==str(i)):
@@ -200,8 +206,13 @@ elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
             heatmap[i][j]=cfactor[i][j]
-plt.subplot(2, 3, 1)
-plotheat(temporary_argument, heatmap, n,2,3,1,kind)
+elif kind=='partition':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=send_local[i][j]
+#plt.subplot(2, 3, 1)
+#plotheat(temporary_argument, heatmap, n,2,3,1,kind)
+plotheat(temporary_argument, heatmap, n,kind)
 
 temporary_argument = '1D'
 for node1 in range(1,network_size+1):
@@ -212,13 +223,18 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
             heatmap[i][j]=cfactor[i][j]
-plt.subplot(2, 3, 2)
-plotheat(temporary_argument, heatmap, n,2,3,2,kind)
+elif kind=='partition':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=send_local[i][j]
+#plt.subplot(1, 1, 1)
+#plotheat(temporary_argument, heatmap, n,1,1,1,kind)
+plotheat(temporary_argument, heatmap, n,kind)
 
 temporary_argument = '1Dtorus'
 for node1 in range(1,network_size+1):
@@ -229,13 +245,18 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
             heatmap[i][j]=cfactor[i][j]
-plt.subplot(2, 3, 3)
-plotheat(temporary_argument, heatmap, n,2,3,3,kind)
+elif kind=='partition':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=send_local[i][j]
+#plt.subplot(2, 3, 3)
+#plotheat(temporary_argument, heatmap, n,2,3,3,kind)
+plotheat(temporary_argument, heatmap, n,kind)
 
 temporary_argument = '2Dmesh'
 for node1 in range(1, rows*columns + 1):
@@ -246,13 +267,18 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
             heatmap[i][j]=cfactor[i][j]
-plt.subplot(2, 3, 4)
-plotheat(temporary_argument, heatmap, n,2,3,4,kind)
+elif kind=='partition':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=send_local[i][j]
+#plt.subplot(2, 3, 4)
+#plotheat(temporary_argument, heatmap, n,2,3,4,kind)
+plotheat(temporary_argument, heatmap, n,kind)
 
 temporary_argument = '2Dmeshtorus'
 for node1 in range(1, rows*columns + 1):
@@ -263,15 +289,20 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
             heatmap[i][j]=cfactor[i][j]
-plt.subplot(2, 3, 5)
-plotheat(temporary_argument, heatmap, n,2,3,5,kind)
+elif kind=='partition':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=send_local[i][j]
+#plt.subplot(2, 3, 5)
+#plotheat(temporary_argument, heatmap, n,2,3,5,kind)
 # Adjust the spacing between subplots
-plt.tight_layout()
+plotheat(temporary_argument, heatmap, n,kind)
 
+#plt.tight_layout()
 # Show the plot
-plt.show()
+#plt.show()
