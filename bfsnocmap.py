@@ -223,7 +223,7 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*2
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
@@ -245,7 +245,7 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*2
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
@@ -267,7 +267,7 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*4
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
@@ -289,7 +289,7 @@ if kind=='send':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*network_size
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*4
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
