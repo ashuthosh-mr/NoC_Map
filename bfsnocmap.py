@@ -71,7 +71,7 @@ def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, su
 
 # Check if the number of command line arguments is valid
 if len(sys.argv) != 6:
-    print("Usage: python communication.py <number_of_nodes> <graph> <number_of_vertices> <rows> <columns> <map,send,cfactor>")
+    print("Usage: python communication.py <number_of_nodes> <graph> <rows> <columns> <map,communication_cost,cfactor>")
     sys.exit(1)
 
 # Parse command line arguments
@@ -197,7 +197,7 @@ for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops_alltoall(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-if kind=='communication cost':
+if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
@@ -219,7 +219,7 @@ for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-if kind=='communication cost':
+if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
@@ -241,7 +241,7 @@ for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
         num_hops = calculate_hops_tor(node1, node2, network_size)
         heatmap[node1-1][node2-1]=num_hops
-if kind=='communication cost':
+if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
@@ -263,7 +263,7 @@ for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-if kind=='communication cost':
+if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
@@ -285,7 +285,7 @@ for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
         num_hops = calculate_hops_2D_torus(node1, node2, rows, columns)
         heatmap[node1-1][node2-1]=num_hops
-if kind=='communication cost':
+if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
