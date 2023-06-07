@@ -37,7 +37,7 @@ def calculate_hops_alltoall(node1, node2,network_size):
     if(node1==node2):
         return node1-node2
     else:
-        return network_size
+        return 1
 
     return row_diff + col_diff
 def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, subplot_index,kind):
@@ -60,7 +60,7 @@ def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, su
     plt.yticks(np.arange(network_size), np.arange(1, network_size+1))
     plt.xlabel('Destination')
     plt.ylabel('Source')
-    plt.title('NoC_MAP of ' + temporary_argument+' and '+kind)
+    plt.title('NoC_MAP of ' + temporary_argument+' and '+kind +','+ part)
     for i in range(network_size):
         for j in range(network_size):
             plt.text(j, i, str(int(heatmap[i, j])), color='black', ha='center', va='center',fontsize=8)
@@ -70,8 +70,8 @@ def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, su
 
 
 # Check if the number of command line arguments is valid
-if len(sys.argv) != 6:
-    print("Usage: python communication.py <number_of_nodes> <graph> <rows> <columns> <map,communication_cost,cfactor>")
+if len(sys.argv) != 7:
+    print("Usage: python bfsnocmap.py <number_of_nodes> <graph> <rows> <columns> <map,communication_cost,cfactor>, <partition>")
     sys.exit(1)
 
 # Parse command line arguments
@@ -80,7 +80,7 @@ graph = sys.argv[2]
 rows = int(sys.argv[3])
 columns = int(sys.argv[4])
 kind = sys.argv[5]
-
+part = sys.argv[6]
 import importlib
 module_name = 'data_' + graph
 importlib.invalidate_caches()  # Optional: Clear import caches if needed
@@ -93,7 +93,11 @@ i=0
 a=0;
 d=0;
 V=0;
-with open('./partitions/tometis'+graph+'.part.'+str(n)) as f3:
+if part=="cut":
+    string='./partitions/edge/tometis'
+else:
+    string='./partitions/tometis'
+with open(string+graph+'.part.'+str(n)) as f3:
     for line in f3:
         Type = line.split()
         V=V+1
@@ -105,7 +109,7 @@ receive_total = [0]*n
 while i<n:
     a=0
     d=0
-    with open('./partitions/tometis'+graph+'.part.'+str(n)) as f3:
+    with open(string+graph+'.part.'+str(n)) as f3:
         for line in f3:
             Type = line.split()
             if(Type[0]==str(i)):
@@ -223,7 +227,7 @@ if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*2
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
@@ -245,7 +249,7 @@ if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*2
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
@@ -267,7 +271,7 @@ if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*4
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
@@ -289,7 +293,7 @@ if kind=='communication_cost':
     for i in range(0,n):
         for j in range(0,n):
             if(send_local[i][j]!=0):
-                heatmap[i][j]=heatmap[i][j]*send_local[i][j]*4
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
 elif kind=='cfactor':
     for i in range(0,n):
         for j in range(0,n):
