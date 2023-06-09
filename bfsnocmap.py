@@ -42,8 +42,29 @@ def calculate_hops_alltoall(node1, node2,network_size):
     return row_diff + col_diff
 def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, subplot_index,kind):
     network_size = n
+    alias_i = 0
+    alias_j = 0
     maximum_value = np.max(heatmap)
-
+    placing = [0]*n
+    heatmap1 = np.zeros((network_size, network_size))
+    heatmap1 = np.copy(heatmap)
+	
+    # Open the file in read mode
+    with open('placing.in', 'r') as file:
+        for line in file:
+            # Remove leading/trailing whitespaces and newline characters
+            line = line.strip()
+            # Split the line by '->' to extract the values
+            values = line.split('->')
+            # Extract the values
+            value1 = int(values[0].strip())
+            value2 = int(values[1].strip())
+            placing[value1]=value2
+    for i in range(0,n):
+        alias_i = placing[i]
+        for j in range(0,n):
+            alias_j = placing[j]
+            heatmap[i][j]= heatmap1[alias_i][alias_j]
     # Create a subplot at the specified index
     #plt.subplot(subplot_row, subplot_col, subplot_index)
 
@@ -195,6 +216,7 @@ for i in range(0,network_size):
         if(send_local[i][j]!=0):
             cfactor[i][j]=round((send_local[i][i]/send_local[i][j]),2)
 heatmap = np.zeros((network_size, network_size))
+# Open the file in read mode
 # Calculate number of hops for all node pairs
 temporary_argument = 'alltoall'
 for node1 in range(1,network_size+1):
