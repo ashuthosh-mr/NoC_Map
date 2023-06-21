@@ -4,7 +4,72 @@ import matplotlib.pyplot as plt
 
 #function definitions
 
+#binary tree
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
 
+def construct_tree(node_values, index):
+    if index < len(node_values):
+        value = node_values[index]
+        if value is None:
+            return None
+
+        node = Node(value)
+        node.left = construct_tree(node_values, 2 * index + 1)
+        node.right = construct_tree(node_values, 2 * index + 2)
+        return node
+
+def find_node(root, value):
+    if root is None or root.data == value:
+        return root
+
+    left_subtree = find_node(root.left, value)
+    if left_subtree is not None:
+        return left_subtree
+
+    right_subtree = find_node(root.right, value)
+    return right_subtree
+
+def find_distance(root, node1, node2):
+    lca = find_lca(root, node1, node2)
+    distance_node1 = find_distance_from_node(lca, node1, 0)
+    distance_node2 = find_distance_from_node(lca, node2, 0)
+    return distance_node1 + distance_node2
+
+def find_lca(root, node1, node2):
+    if root is None:
+        return None
+
+    if root == node1 or root == node2:
+        return root
+
+    left_lca = find_lca(root.left, node1, node2)
+    right_lca = find_lca(root.right, node1, node2)
+
+    if left_lca and right_lca:
+        return root
+
+    return left_lca if left_lca is not None else right_lca
+
+def find_distance_from_node(node, target, distance):
+    if node is None:
+        return -1
+
+    if node == target:
+        return distance
+
+    left_distance = find_distance_from_node(node.left, target, distance + 1)
+    if left_distance != -1:
+        return left_distance
+
+    right_distance = find_distance_from_node(node.right, target, distance + 1)
+    return right_distance
+
+
+####################################################do not touch
 def calculate_hops(node1, node2, network_size):
     return abs(node1 - node2)
 
@@ -42,32 +107,10 @@ def calculate_hops_alltoall(node1, node2,network_size):
     return row_diff + col_diff
 def plotheat(temporary_argument, heatmap, n, kind):#subplot_row, subplot_col, subplot_index,kind):
     network_size = n
-    alias_i = 0
-    alias_j = 0
+    #alias_i = 0
+    #alias_j = 0
     maximum_value = np.max(heatmap)
-    placing = [0]*n
-    heatmap1 = np.zeros((network_size, network_size))
-    heatmap1 = np.copy(heatmap)
-	
-    # Open the file in read mode
-    with open('placing.in', 'r') as file:
-        for line in file:
-            # Remove leading/trailing whitespaces and newline characters
-            line = line.strip()
-            # Split the line by '->' to extract the values
-            values = line.split('->')
-            # Extract the values
-            value1 = int(values[0].strip())
-            value2 = int(values[1].strip())
-            placing[value1]=value2
-    for i in range(0,n):
-        alias_i = placing[i]
-        for j in range(0,n):
-            alias_j = placing[j]
-            heatmap[i][j]= heatmap1[alias_i][alias_j]
-    # Create a subplot at the specified index
-    #plt.subplot(subplot_row, subplot_col, subplot_index)
-
+    #placing = [0]*n
     # Create the heatmap
     plt.imshow(heatmap, cmap='Greens', interpolation='nearest', vmin=0, vmax=maximum_value)
 
@@ -202,7 +245,19 @@ for i in range(len(send_total)):
 #for i in range(len(send_total)):
 #    cfactor[i]=round((inter_communication[i]/intra_communication[i]),2)
 
-
+placing = [0]*n
+	
+    # Open the file in read mode
+with open('placing.in', 'r') as file:
+    for line in file:
+        # Remove leading/trailing whitespaces and newline characters
+        line = line.strip()
+        # Split the line by '->' to extract the values
+        values = line.split('->')
+            # Extract the values
+        value1 = int(values[0].strip())
+        value2 = int(values[1].strip())
+        placing[value1]=value2
 #debug
 #for i in range (0,n-1):
 #    temp2=temp2+send_local[15][i]
@@ -221,7 +276,7 @@ heatmap = np.zeros((network_size, network_size))
 temporary_argument = 'alltoall'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
-        num_hops = calculate_hops_alltoall(node1, node2, network_size)
+        num_hops = calculate_hops_alltoall(placing[node1-1], placing[node2-1], network_size)
         heatmap[node1-1][node2-1]=num_hops
 if kind=='communication_cost':
     for i in range(0,n):
@@ -243,7 +298,7 @@ plotheat(temporary_argument, heatmap, n,kind)
 temporary_argument = '1D'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
-        num_hops = calculate_hops(node1, node2, network_size)
+        num_hops = calculate_hops(placing[node1-1], placing[node2-1], network_size)
         heatmap[node1-1][node2-1]=num_hops
 if kind=='communication_cost':
     for i in range(0,n):
@@ -265,7 +320,7 @@ plotheat(temporary_argument, heatmap, n,kind)
 temporary_argument = '1Dtorus'
 for node1 in range(1,network_size+1):
     for node2 in range(1,network_size+1):
-        num_hops = calculate_hops_tor(node1, node2, network_size)
+        num_hops = calculate_hops_tor(placing[node1-1], placing[node2-1], network_size)      
         heatmap[node1-1][node2-1]=num_hops
 if kind=='communication_cost':
     for i in range(0,n):
@@ -287,7 +342,7 @@ plotheat(temporary_argument, heatmap, n,kind)
 temporary_argument = '2Dmesh'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
-        num_hops = calculate_hops_2D(node1, node2, rows, columns)
+        num_hops = calculate_hops_2D(placing[node1-1], placing[node2-1], rows, columns)
         heatmap[node1-1][node2-1]=num_hops
 if kind=='communication_cost':
     for i in range(0,n):
@@ -309,7 +364,7 @@ plotheat(temporary_argument, heatmap, n,kind)
 temporary_argument = '2Dmeshtorus'
 for node1 in range(1, rows*columns + 1):
     for node2 in range(1, rows*columns + 1):
-        num_hops = calculate_hops_2D_torus(node1, node2, rows, columns)
+        num_hops = calculate_hops_2D_torus(placing[node1-1], placing[node2-1], rows, columns)
         heatmap[node1-1][node2-1]=num_hops
 if kind=='communication_cost':
     for i in range(0,n):
@@ -329,6 +384,41 @@ elif kind=='partition':
 # Adjust the spacing between subplots
 plotheat(temporary_argument, heatmap, n,kind)
 
+
+# Example usage
+node_values = [0]*n
+
+#for i in range(0,n):
+#    alias_i = placing[i]
+#        for j in range(0,n):
+#            alias_j = placing[j]
+#            heatmap[i][j]= heatmap1[alias_i][alias_j]
+for i in range(0,n):
+    node_values[i]=i+1
+root = construct_tree(node_values, 0)
+temporary_argument = 'binarytree'
+for node1 in range(0, n):
+    for node2 in range(0, n):
+        node3 = find_node(root, node1+1)
+        node4 = find_node(root, node2+1)
+        num_hops = find_distance(root,node3,node4)
+        heatmap[placing[node1]][placing[node2]]=num_hops
+if kind=='communication_cost':
+    for i in range(0,n):
+        for j in range(0,n):
+            if(send_local[i][j]!=0):
+                heatmap[i][j]=heatmap[i][j]*send_local[i][j]
+elif kind=='cfactor':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=cfactor[i][j]
+elif kind=='partition':
+    for i in range(0,n):
+        for j in range(0,n):
+            heatmap[i][j]=send_local[i][j]
+plotheat(temporary_argument, heatmap, n, kind)
+
+# Find the distance between nodes 4 and 7
 #plt.tight_layout()
 # Show the plot
 #plt.show()
