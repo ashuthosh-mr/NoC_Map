@@ -170,6 +170,7 @@ hown = np.zeros((n,V), dtype=int)
 send_local = np.zeros((n,n), dtype=int)
 send_total = [0]*n
 receive_total = [0]*n
+'''
 while i<n:
     a=0
     d=0
@@ -184,6 +185,55 @@ while i<n:
                 hown[i][d]=-1*temp
             d=d+1
     i=i+1
+'''
+
+p = 0
+for j in range(0,795):
+    hown[0][j]=p
+    p=p+1
+for j in range(795,795+834):
+    hown[0][j]=-2
+for j in range(795+834,795+834+832):
+    hown[0][j]=-3
+for j in range(795+834+832,V):
+    hown[0][j]=-4
+print(p)
+
+p=0
+for j in range(0,795):
+    hown[1][j]=-1
+for j in range(795,795+834):
+    hown[1][j]=p
+    p=p+1
+for j in range(795+834,795+834+832):
+    hown[1][j]=-3
+for j in range(795+834+832,V):
+    hown[1][j]=-4
+print(p)
+p=0
+for j in range(0,795):
+    hown[2][j]=-1
+for j in range(795,795+834):
+    hown[2][j]=-2
+for j in range(795+834,795+834+832):
+    hown[2][j]=p
+    p=p+1
+for j in range(795+834+832,V):
+    hown[2][j]=-4
+print(p)
+    
+p=0
+
+for j in range(0,795):
+    hown[3][j]=-1
+for j in range(795,795+834):
+    hown[3][j]=-2
+for j in range(795+834,795+834+832):
+    hown[3][j]=-3
+for j in range(795+834+832,V):
+    hown[3][j]=p
+    p=p+1
+print(p)
 #bfs
 h_graph_active = []
 h_updating_graph_active = []

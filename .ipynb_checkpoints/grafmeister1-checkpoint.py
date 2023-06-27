@@ -118,18 +118,36 @@ while n<max_core + 1:
     temp4 = 0
     for i in range(0,n):
         k = 0
-        for j in range(0,n):
+        sorted_row = np.sort(send_local[i])
+        for j in range(0,n-1):
             temp2=0
-            if(i!=j):
-                temp1 = send_local[i][j]
-            if(i!=j):
-                for k in range(0,n):
-                    if(temp1 >= send_local[i][k]):
-                        temp2=temp2+1
-                temp3 = ((temp1*((arbit_latency(temp2)*2)+c3)))
-                communication[i]=temp3+communication[i]
-        temp4=(n-1)*iter*(arbit_latency(n)+arbit_latency(n)+8)
+            temp1=sorted_row[j]
+            if(temp1>0):
+                for k in range(0,n-1):
+                    if(j!=k):
+                        if(sorted_row[k]>=temp1):
+                            temp2=temp2+1
+                            sorted_row[k]=sorted_row[k]-temp1
+            temp3 = ((temp1*((arbit_latency(temp2)*2)+c3)))
+            communication[i]=temp3+communication[i]
+        temp4 = (n-1)*iter*(arbit_latency(n)+arbit_latency(n)+8)
         communication[i]=communication[i]+temp4
+        #  if(i!=j):
+           #     temp1 = send_local[i][j]
+           # if(i!=j):
+       #     for k in range(0,n-1):
+        #        if(j!=k):
+         #           if(temp1 >= sorted_row[k]):
+          #              #]_local[i][k]):
+           #             temp2=temp2+1
+            #            sorted_row[k]=
+            #temp3 = ((temp1*((arbit_latency(temp2)*2)+c3)))
+            #communication[i]=temp3+communication[i]
+            #for o in range(0,n-1):
+             #   if(temp1>)
+              #  sorted_row[o]
+       # temp4=(n-1)*iter*(arbit_latency(n)+arbit_latency(n)+8)
+       # communication[i]=communication[i]+temp4
     '''          
             
         temp1 = send_local[i][k]
@@ -157,9 +175,14 @@ while n<max_core + 1:
     #tcopy
     '''
     ###########total latency
+    print("the total latency of number :", n)
     for i in range(0,n):
         total[i] = traversal[i] + communication[i] + sync[i]
-
+        print("core count:",i)
+        print(traversal[i])
+        print(sync[i])
+        print(communication[i])
+        
     speedup[n-1] = round((single_latency / max(total)), 2)
     core_latency[n-1] = max(total)
     i = np.argmax(total)
